@@ -4,9 +4,10 @@
   "description": "",
   "main": "src/app.ts",
   "scripts": {
-    "start": "npx tsc && node ./dist/app.js",
+    "start": "NODE_ENV=development npx tsc && node ./dist/app.js",
     "start-dev": "node_modules/.bin/tsc-watch --onSuccess 'node ./dist/app.js'",
     "compile": "npx tsc",
+    "resetDB": "npx tsc && NODE_ENV=development FORCE=1 node ./tools/resetDB.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -25,7 +26,10 @@
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "path": "^0.12.7",
+    "pg": "^8.9.0",
+    "sequelize": "^6.28.0"
   },
   "devDependencies": {
     "@types/express": "^4.17.14",

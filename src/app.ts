@@ -1,5 +1,6 @@
 import express from "express";
 import dotenv from 'dotenv';
+const { NODE_ENV, SQL_DATABASE} = require("./config/env.config");
 dotenv.config();
 
 // Express Server
@@ -32,8 +33,11 @@ app.use("/login", loginRoutes);
 app.use(express.json());
 app.use(cookieParser());
 
+// Show some debug message to show environment is correct
+console.log("Environment:", NODE_ENV, "\nDatabase:", SQL_DATABASE);
 // Start listening on selected port
-app.listen(PORT, (error?: any) => {
+http.createServer(app);
+http.listen(PORT, (error?: any) => {
         if(!error)
             console.log("Server is Successfully Running, and App is listening on port " + PORT)
     else
