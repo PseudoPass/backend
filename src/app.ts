@@ -1,11 +1,10 @@
 import express from "express";
 import dotenv from 'dotenv';
-const { NODE_ENV, SQL_DATABASE} = require("./config/env.config");
+const { CORS_ORIGIN_URL, NODE_ENV, SQL_DATABASE, EXPRESS_SERVER_PORT } = require("./config/env.config");
 dotenv.config();
 
 // Express Server
 const app = express();
-const PORT = 4000;
 const http = require('http');
 const bodyParser = require("body-parser");
 const jsonParser = bodyParser.json();
@@ -14,7 +13,7 @@ app.use(jsonParser); // use it globally
 // CORS
 const cors = require('cors');
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: CORS_ORIGIN_URL,
     credentials: true
 }));
 // Environment
@@ -36,9 +35,9 @@ app.use(cookieParser());
 // Show some debug message to show environment is correct
 console.log("Environment:", NODE_ENV, "\nDatabase:", SQL_DATABASE);
 // Start listening on selected port
-http.createServer(app).listen(PORT, (error?: any) => {
+http.createServer(app).listen(EXPRESS_SERVER_PORT, (error?: any) => {
         if(!error)
-            console.log("Server is Successfully Running, and App is listening on port " + PORT)
+            console.log("Server is Successfully Running, and App is listening on port " + EXPRESS_SERVER_PORT)
     else
         console.log("Error occurred, server can't start", error);
     }
