@@ -8,12 +8,12 @@ const sequelize = new Sequelize(SQL_DATABASE, SQL_USER, SQL_PASS, {
     dialect: SQL_DIALECT,
     sync: true  //create the table if it does not exist
 });
-sequelize.sync()
-    .then((result: any) => {
-        console.log(result);
-    })
-    .catch((err: any) => {
-        console.log(err);
-    });
+// sequelize.sync()
+//     .then((result: any) => {
+//         console.log(result);
+//     })
+//     .catch((err: any) => {
+//         console.log(err);
+//     });
 module.exports = sequelize;
 export {};

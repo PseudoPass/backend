@@ -19,5 +19,6 @@ from the project's root directory
    - Note: Do NOT change the file contents of `sample.env` with your credentials!
 4. Install necessary node.js packages `npm install`
 5. Run the InitializeDatabase script to initialize the database models: 
-`NODE_ENV=development FORCE=1 ./tools/initDB.ss`
+`npm run syncdb` 
+   - Note: To reset all database tables and delete their data, run `npm run force-syncdb`
 6. Run the development server in watch mode`npm run start-dev`

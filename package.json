@@ -1,5 +1,5 @@
 {
-  "name": "pseudo-pass-backend",
+  "name": "backend",
   "version": "0.0.1",
   "description": "",
   "main": "src/app.ts",
@@ -7,7 +7,8 @@
     "start": "NODE_ENV=development npx tsc && node ./dist/app.js",
     "start-dev": "node_modules/.bin/tsc-watch --onSuccess 'node ./dist/app.js'",
     "compile": "npx tsc",
-    "resetDB": "npx tsc && NODE_ENV=development FORCE=1 node ./tools/resetDB.js",
+    "syncdb": "npx tsc && NODE_ENV=development node ./tools/resetDB.js",
+    "force-syncdb": "npx tsc && NODE_ENV=development FORCE=1 node ./tools/resetDB.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -15,7 +16,7 @@
     "url": "git+https://github.com/mruiz42/pseudo-pass-backend.git"
   },
   "keywords": [],
-  "author": "PseudoPass Team",
+  "author": "Team PseudoPass",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/mruiz42/pseudo-pass-backend/issues"
