@@ -41,4 +41,4 @@ function handleResponse(req: any, res: any, statusCode: number, message?: string
     return res.status(statusCode).json(resObj);
 }
 
-export default { handleResponse };
+export default handleResponse;
