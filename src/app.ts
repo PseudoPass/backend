@@ -6,6 +6,10 @@ dotenv.config();
 const app = express();
 const PORT = 4000;
 const http = require('http');
+const bodyParser = require("body-parser");
+const jsonParser = bodyParser.json();
+const cookieParser = require('cookie-parser');
+app.use(jsonParser); // use it globally
 // CORS
 const cors = require('cors');
 app.use(cors({
@@ -24,12 +28,10 @@ app.use("/credentials", credentialRoutes);
 app.use("/dids", didRoutes);
 app.use("/login", loginRoutes);
 
+// Define middleware
 app.use(express.json());
-app.post('/', (req: { body: { name: any; }; }, res: { send: (arg0: string) => void; })=>{
-    const {name} = req.body;
+app.use(cookieParser());
 
-    res.send(`Welcome ${name}`);
-})
 // Start listening on selected port
 app.listen(PORT, (error?: any) => {
         if(!error)
