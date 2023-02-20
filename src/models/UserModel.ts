@@ -2,10 +2,9 @@ const Sequelize = require('sequelize');
 const db = require('../config/sequelize.config');
 
 const UserModel = db.define('user', {
-    userId: {
-        type: Sequelize.INTEGER,
-        autoIncrement: true,
-        primaryKey: true
+    googleId: {
+        type: Sequelize.STRING,
+        allowNull: false
     },
     name: {
         type: Sequelize.STRING,
