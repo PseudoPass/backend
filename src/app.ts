@@ -35,13 +35,11 @@ app.use(cors({ origin: CORS_ORIGIN_URL, credentials: true }));
 // Routes
 const credentialRoutes = require('./routes/credentialRoutes');
 const didRoutes = require('./routes/didRoutes');
-const loginRoutes = require('./routes/loginRoutes');
 const authRoutes = require('./routes/authRoutes');
 
 // Define routes
 app.use("/credentials", credentialRoutes);
 app.use("/dids", didRoutes);
-app.use("/login", loginRoutes);
 app.use("/auth", authRoutes);
 
 // Define middleware

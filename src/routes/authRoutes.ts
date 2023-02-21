@@ -31,7 +31,7 @@ router.get("/logout")
 router.get("/validate", (req: any, res, next) => {
     console.log("Authenticating user...")
     if (req.user) {
-        res.send("OK")
+        res.send(req.user)
         console.log(req.user)
         // next();
     } else {
