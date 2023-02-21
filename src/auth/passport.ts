@@ -12,9 +12,18 @@ passport.use(new GoogleStrategy({
         callbackURL: GoogleCallbackUrl,
         passReqToCallback: true
     }, async (req: any, accessToken: any, refreshToken: any, profile: any, cb: any) => {
+        console.log("DEBUG - Profile info: ", profile);
+        // Optionally, check the domain for *@sjsu.edu to verify association with school
         const user = await User.findOrCreate({
-            where: { googleId: profile.id },
-            defaults: { name: "John Smith", email: "johnsmith@sjsu.edu" }
+            where: {
+                googleId: profile.id,
+                displayName: profile.displayName,
+                familyName: profile.name.familyName,
+                givenName: profile.name.givenName,
+                email: profile.emails[0].value,
+                verified: true,
+                imageUri: profile.photos[0].value
+            },
         }).catch((err: any) => {
             console.log("Error signing up", err);
             cb(err, null);

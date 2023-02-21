@@ -6,7 +6,7 @@ const passport = require('passport');
 const successLoginUrl = "http://localhost:3000/login/success"
 const errorLoginUrl = "http://localhost:3000/login/error"
 
-router.get("/google", passport.authenticate("google", { scope: ["profile"]},
+router.get("/google", passport.authenticate("google", { scope: ["profile", "email"]},
     (req:any, res:any) => {
         console.log("hi")
 }));
@@ -32,6 +32,7 @@ router.get("/validate", (req: any, res, next) => {
     console.log("Authenticating user...")
     if (req.user) {
         res.send("OK")
+        console.log(req.user)
         // next();
     } else {
         res.status(401).send("You must login first!");

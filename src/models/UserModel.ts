@@ -6,7 +6,15 @@ const UserModel = db.define('user', {
         type: Sequelize.STRING,
         allowNull: false
     },
-    name: {
+    displayName: {
+        type: Sequelize.STRING,
+        allowNull: false
+    },
+    familyName: {
+        type: Sequelize.STRING,
+        allowNull: false
+    },
+    givenName: {
         type: Sequelize.STRING,
         allowNull: false
     },
