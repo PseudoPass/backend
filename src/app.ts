@@ -1,5 +1,4 @@
 import express from "express";
-import dotenv from 'dotenv';
 
 // Environment
 const { CORS_ORIGIN_URL, NODE_ENV, SQL_DATABASE, EXPRESS_SERVER_PORT } = require("./config/env.config");
@@ -31,7 +30,7 @@ app.use(passport.session());
 
 // CORS
 const cors = require('cors');
-app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+app.use(cors({ origin: CORS_ORIGIN_URL, credentials: true }));
 
 // Routes
 const credentialRoutes = require('./routes/credentialRoutes');

@@ -22,16 +22,17 @@ router.get('/google/redirect',
         res.send('Successfully logged in');
     });
 
-router.get("/google/failure", (req:any, res:any) => {
+router.get("/google/failure", (req: any, res: any) => {
     handleResponse(req, res, 403, "AUTH FAILURE")
 });
 
 router.get("/logout")
 
-router.get("/validate", (req:any, res, next) => {
+router.get("/validate", (req: any, res, next) => {
     console.log("Authenticating user...")
     if (req.user) {
-        next();
+        res.send("OK")
+        // next();
     } else {
         res.status(401).send("You must login first!");
     }
