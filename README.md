@@ -6,7 +6,8 @@ Express.js server
 If you do not already have a postgres instance setup on your machine, follow [these](https://hub.docker.com/_/postgres) instructions:
 ```bash
 docker pull postgres
-docker run --name pseudopass-postgres -p 5432:5432 -e POSTGRES_PASSWORD=pseudopass-default-password123 -d postgresdocker exec -it pseudopass-postgres bash
+docker run --name pseudopass-postgres -p 5432:5432 -e POSTGRES_PASSWORD=pseudopass-default-password123 -d postgres
+docker exec -it pseudopass-postgres bash
 su postgres
 createdb pseudopass
 exit
