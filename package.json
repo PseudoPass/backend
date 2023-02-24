@@ -4,11 +4,12 @@
   "description": "",
   "main": "src/app.ts",
   "scripts": {
-    "start": "NODE_ENV=development npx tsc && node ./dist/app.js",
+    "start": "npx tsc && NODE_ENV=development node ./dist/app.js",
     "start-dev": "NODE_ENV=development node_modules/.bin/tsc-watch --onSuccess 'node ./dist/app.js'",
     "compile": "npx tsc",
     "syncdb": "npx tsc && NODE_ENV=development node ./tools/resetDB.js",
     "force-syncdb": "npx tsc && NODE_ENV=development FORCE=1 node ./tools/resetDB.js",
+    "copy-env": "mv ./development.env ./development.env.bak && cp ./examples/sample.env ./development.env",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
