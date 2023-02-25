@@ -20,53 +20,45 @@ passport.use(new GoogleStrategy({
         console.log("DEBUG - Profile info: ", profile);
         console.log("Looking up user email, creating if it does not exist.")
         // TODO: Optionally, check the domain for *@sjsu.edu to verify association with school
-        const [user, created] = await User.findOrCreate({
-            where: {
-                email: profile.emails[0].value
-            },
-            defaults: {
-                googleId: profile.id,
-                displayName: profile.displayName,
-                familyName: profile.name.familyName,
-                givenName: profile.name.givenName,
-                verified: true,
-                imageUri: profile.photos[0].value
-            }
-        })
-            .catch((err: any) => {
-                console.log("Error signing up", err);
-                cb(err, null);
-        });
-        if (created) {
-            const dockioReq = await axios.post(DOCKIO_BASE_URL + "dids", {}, {
-                headers: {
-                    "DOCK-API-TOKEN": DOCKIO_API_TOKEN
+        try {
+            const user = await User.findOrCreate({
+                where: {
+                    email: profile.emails[0].value
+                },
+                defaults: {
+                    googleId: profile.id,
+                    displayName: profile.displayName,
+                    familyName: profile.name.familyName,
+                    givenName: profile.name.givenName,
+                    verified: true,
+                    imageUri: profile.photos[0].value
                 }
-            })
-                .then((result) => {
-                    console.log(result.data)
-                    Did.create({
-                        didId: result.data.id,
-                        didStr: result.data.data.did,
-                        hexDidStr: result.data.data.hexDid,
-                        controllerStr: result.data.data.controller,
-                        relation: user.id
-                    })
-                        .then((r: any) => {
-                            console.log(r)
-                            if (user && user[0]) return cb(null, user && user[0]);
-
-                        })
-                        .catch((err: any) => {
-                            console.log(err);
-                        })
+            });
+            // If new user is created, then also generate and insert a new DID for this user
+            if (false) {
+                const response = await axios.post(DOCKIO_BASE_URL + "dids", {}, {
+                    headers: {
+                        "DOCK-API-TOKEN": DOCKIO_API_TOKEN
+                    }
+                });
+                const did = await Did.create({
+                    didId: response.data.id,
+                    didStr: response.data.data.did,
+                    hexDidStr: response.data.data.hexDid,
+                    controllerStr: response.data.data.controller,
+                    relation: user.id
                 })
-                .catch((err) => {
-                    console.log(err)
-                })
+            }
+            console.log("returning callback", user)
+            if (user && user[0]) {
+                return cb(null, user && user[0]);
+            }
+        } catch (err) {
+            console.log(err)
+            cb(err, null)
         }
-        if (user && user[0]) return cb(null, user && user[0]);
     }
+
 ))
 
 passport.serializeUser((user: any, cb: any) => {
