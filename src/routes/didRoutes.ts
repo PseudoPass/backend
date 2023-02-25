@@ -1,9 +1,10 @@
 import express from "express";
 const router = express.Router();
-const {postDids, getDid, getDidByUUID, deleteDidByUUID} = require("../controllers/didController");
+const {createDids, getDid, getDidByUUID, deleteDidByUUID} = require("../controllers/didController");
 
-router.post('/', (req: any, res: any, next: any) => {
-    postDids(req, res);
+router.post('/create', (req: any, res: any, next: any) => {
+    console.log("create")
+    createDids(req, res);
 });
 
 router.get('/:uuid', (req: any, res: any, next: any) => {
