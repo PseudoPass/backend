@@ -26,12 +26,20 @@ router.get("/google/failure", (req: any, res: any) => {
     handleResponse(req, res, 403, "AUTH FAILURE")
 });
 
-router.get("/logout")
+router.post('/logout', (req: any, res: any, next) => {
+    console.log("Logging out user...")
+    req.logout(function(err: any) {
+        if (err) { return next(err); }
+        console.log("Logged out?")
+        res.clearCookie('connect.sid', {path: '/'}).status(200).send('Ok.');
+    });
+});
 
 router.get("/validate", (req: any, res, next) => {
-    console.log("Authenticating user...")
+    console.log("Validating user authentication...")
     if (req.user) {
-        res.send(req.user)
+        // res.send(req.user
+        handleResponse(req, res, 200);
         console.log(req.user)
         // next();
     } else {
