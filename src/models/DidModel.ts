@@ -1,12 +1,3 @@
-// {
-//     "id": "6180",
-//     "data": {
-//     "did": "did:dock:5CKJ6mvuQtEjKbf8PLA8uqL9w5HxFVmUdZpUaB58mhtxCkLG",
-//         "hexDid": "0x0b20b5679bac373c839ca6cc7029e96ed6963a5c3e582f2a43aacb16db3b66b4",
-//         "controller": "did:dock:5CKJ6mvuQtEjKbf8PLA8uqL9w5HxFVmUdZpUaB58mhtxCkLG"
-// }
-// }
-
 import Sequelize from 'sequelize';
 const db = require('../config/sequelize.config');
 
@@ -16,7 +7,7 @@ const DidModel = db.define('did', {
         autoIncrement: true,
         primaryKey: true
     },
-    didId: {
+    dockioId: {
         type: Sequelize.STRING,
         allowNull: false
     },
@@ -32,10 +23,11 @@ const DidModel = db.define('did', {
         type: Sequelize.STRING,
         allowNull: false
     },
-    relation: {
+    references: {
         type: Sequelize.INTEGER,
+        allowNull: false,
         model: 'user',
-        key: 'id'
+        key: 'userId'
     }
 });
 
