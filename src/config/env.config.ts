@@ -24,6 +24,8 @@ module.exports = {
     SQL_PASS: process.env.SQL_PASSWORD,
     SQL_DATABASE: process.env.SQL_DATABASE,
     SQL_DIALECT: process.env.SQL_DIALECT,
+    DOCKIO_BASE_URL: process.env.DOCKIO_BASE_URL,
+    DOCKIO_API_TOKEN: process.env.DOCKIO_API_TOKEN,
     EXPRESS_SESSION_SECRET: process.env.EXPRESS_SESSION_SECRET,
     REDIS_HOST: process.env.REDIS_HOST || 'localhost',
     REDIS_PORT: process.env.REDIS_PORT,

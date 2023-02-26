@@ -1,41 +1,34 @@
-const Sequelize = require('sequelize');
+import Sequelize from 'sequelize';
 const db = require('../config/sequelize.config');
 
-const UserModel = db.define('user', {
+const DidModel = db.define('did', {
     id: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
         primaryKey: true
     },
-    googleId: {
+    dockioId: {
         type: Sequelize.STRING,
         allowNull: false
     },
-    displayName: {
+    didStr: {
         type: Sequelize.STRING,
         allowNull: false
     },
-    familyName: {
+    hexDidStr: {
         type: Sequelize.STRING,
         allowNull: false
     },
-    givenName: {
+    controllerStr: {
         type: Sequelize.STRING,
         allowNull: false
     },
-    email: {
-        type: Sequelize.STRING,
+    references: {
+        type: Sequelize.INTEGER,
         allowNull: false,
-    },
-    verified: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: false
-    },
-    imageUri: {
-        type: Sequelize.STRING,
-        allowNull: true
+        model: 'user',
+        key: 'userId'
     }
 });
 
-module.exports = UserModel;
+module.exports = DidModel;

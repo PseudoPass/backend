@@ -1,5 +1,7 @@
+import axios from 'axios';
+const {DOCKIO_API_TOKEN, DOCKIO_BASE_URL} = require('../config/env.config');
 
-exports.postDids = (req: any, res: any) => {
+exports.createDids = (req: any, res: any) => {
 
 }
 
