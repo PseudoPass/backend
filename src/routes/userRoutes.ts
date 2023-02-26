@@ -8,6 +8,11 @@ const errorLoginUrl = "http://localhost:3000/login/error"
 
 
 router.get("/profile", (req: any, res, next) => {
+    // const did = await Did.findOne({
+    //     where: {
+    //         userId
+    //     }
+    // })
     if (req.user) {
         res.send(req.user)
         console.log(req.user)

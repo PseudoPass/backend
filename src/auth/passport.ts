@@ -7,10 +7,9 @@ const ExtractJwt = passportJwt.ExtractJwt;
 const StrategyJwt = passportJwt.Strategy;
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const GoogleCallbackUrl = "http://localhost:4000/auth/google/redirect";
-const { createDids } = require('../controllers/didController');
 const {DOCKIO_API_TOKEN, DOCKIO_BASE_URL} = require('../config/env.config');
 
-
+// This strategy is called when a user tries logging using the Google OAUTH button
 passport.use(new GoogleStrategy({
         clientID: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
@@ -18,10 +17,10 @@ passport.use(new GoogleStrategy({
         passReqToCallback: true
     }, async (req: any, accessToken: any, refreshToken: any, profile: any, cb: any) => {
         console.log("DEBUG - Profile info: ", profile);
-        console.log("Looking up user email, creating if it does not exist.")
+        console.log("Looking for user email in our database ...")
         // TODO: Optionally, check the domain for *@sjsu.edu to verify association with school
         try {
-            const user = await User.findOrCreate({
+            const [user, created] = await User.findOrCreate({
                 where: {
                     email: profile.emails[0].value
                 },
@@ -35,23 +34,33 @@ passport.use(new GoogleStrategy({
                 }
             });
             // If new user is created, then also generate and insert a new DID for this user
-            if (false) {
+            if (created) {
+                console.log("Created new user record !");
+                console.log("DEBUG - USER :", user)
+                console.log("Generating DID using Dock.io ...")
+                // Make a call to Dock.io API to create a new DID for new user
                 const response = await axios.post(DOCKIO_BASE_URL + "dids", {}, {
                     headers: {
                         "DOCK-API-TOKEN": DOCKIO_API_TOKEN
                     }
                 });
+                // Insert the DID into the database
+                console.log("Inserting new record for user:", user.id ,"'s generated DID ...")
                 const did = await Did.create({
-                    didId: response.data.id,
+                    dockioId: response.data.id,
                     didStr: response.data.data.did,
                     hexDidStr: response.data.data.hexDid,
                     controllerStr: response.data.data.controller,
-                    relation: user.id
+                    references: user.id
                 })
             }
-            console.log("returning callback", user)
-            if (user && user[0]) {
-                return cb(null, user && user[0]);
+            console.log("Logging in ...", user.dataValues);
+            // TODO: Double check this logic, unsure if data being kept in user or user[0] when returning [user, created] on User.findOrCreate
+            if (user || user[0]) {
+                return cb(null, user);
+            }
+            else {
+                return cb("500", null);
             }
         } catch (err) {
             console.log(err)

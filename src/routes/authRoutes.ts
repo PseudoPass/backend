@@ -36,11 +36,11 @@ router.post('/logout', (req: any, res: any, next) => {
 });
 
 router.get("/validate", (req: any, res, next) => {
-    console.log("Validating user authentication...")
+    console.log("Validating user authentication...");
     if (req.user) {
-        // res.send(req.user
+        // res.send(req.user);
         handleResponse(req, res, 200);
-        console.log(req.user)
+        console.log(req.user);
         // next();
     } else {
         res.status(401).send("You must login first!");
