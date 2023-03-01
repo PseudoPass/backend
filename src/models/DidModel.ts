@@ -27,7 +27,7 @@ const DidModel = db.define('did', {
         type: Sequelize.INTEGER,
         allowNull: false,
         model: 'user',
-        key: 'userId'
+        key: 'id'
     }
 });
 
