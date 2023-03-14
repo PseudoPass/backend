@@ -1,6 +1,7 @@
 const db = require('../dist/config/sequelize.config');
 const User = require('../dist/models/UserModel');
 const Did = require('../dist/models/DidModel');
+const Credential = require('../dist/models/CredentialModel')
 // FORCE WILL DELETE EVERYTHING FROM DATABASE!!
 let isForce = false;
 if (process.env.FORCE === "1") {
@@ -11,8 +12,7 @@ db.sync({force: isForce})
         if (isForce) {
             console.log("Forcefully synced database tables");
         }
-        console.log("Synced:", User.name, "table")
-        console.log("Synced:", Did.name, "table")
+        console.log("Synced: [", User.name, "|", Did.name, "|", Credential.name, "] table(s)")
         console.log("!--- DATABASE TABLES SYNCED ---!")
         process.exit(0);
     })

@@ -29,4 +29,5 @@ module.exports = {
     EXPRESS_SESSION_SECRET: process.env.EXPRESS_SESSION_SECRET,
     REDIS_HOST: process.env.REDIS_HOST || 'localhost',
     REDIS_PORT: process.env.REDIS_PORT,
+    DOCKIO_ISSUER_DID: process.env.DOCKIO_ISSUER_DID
 }
