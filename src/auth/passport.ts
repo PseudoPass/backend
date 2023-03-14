@@ -1,13 +1,28 @@
 import axios from "axios";
 const User = require("../models/UserModel");
 const Did = require('../models/DidModel');
+const Credential = require("../models/CredentialModel")
 const passport = require('passport');
 const passportJwt = require("passport-jwt");
 const ExtractJwt = passportJwt.ExtractJwt;
 const StrategyJwt = passportJwt.Strategy;
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const GoogleCallbackUrl = "http://localhost:4000/auth/google/redirect";
-const {DOCKIO_API_TOKEN, DOCKIO_BASE_URL} = require('../config/env.config');
+const {DOCKIO_API_TOKEN, DOCKIO_BASE_URL, DOCKIO_ISSUER_DID} = require('../config/env.config');
+
+function getEmailDomain(email: string) {
+    // extract domain using regex
+    var regex = /@[a-z0-9\-]+\.[a-z]{2,}$/i;
+    var domain = email.match(regex);
+
+    if (domain) {
+        // remove '@' symbol from the domain
+        return domain[0].slice(1);
+    } else {
+        // return null if no domain found
+        return null;
+    }
+}
 
 // This strategy is called when a user tries logging using the Google OAUTH button
 passport.use(new GoogleStrategy({
@@ -19,6 +34,9 @@ passport.use(new GoogleStrategy({
         console.log("DEBUG - Profile info: ", profile);
         console.log("Looking for user email in our database ...")
         // TODO: Optionally, check the domain for *@sjsu.edu to verify association with school
+        if (getEmailDomain(profile.emails[0].value) !== "sjsu.edu") {
+            return cb("402", null);
+        }
         try {
             const [user, created] = await User.findOrCreate({
                 where: {
@@ -39,18 +57,54 @@ passport.use(new GoogleStrategy({
                 console.log("DEBUG - USER :", user)
                 console.log("Generating DID using Dock.io ...")
                 // Make a call to Dock.io API to create a new DID for new user
-                const response = await axios.post(DOCKIO_BASE_URL + "dids", {}, {
+                const didResponse = await axios.post(DOCKIO_BASE_URL + "dids", {}, {
                     headers: {
                         "DOCK-API-TOKEN": DOCKIO_API_TOKEN
                     }
                 });
                 // Insert the DID into the database
                 console.log("Inserting new record for user:", user.id ,"'s generated DID ...")
+                console.log(didResponse.data)
                 const did = await Did.create({
-                    dockioId: response.data.id,
-                    didStr: response.data.data.did,
-                    hexDidStr: response.data.data.hexDid,
-                    controllerStr: response.data.data.controller,
+                    dockioId: didResponse.data.id,
+                    didStr: didResponse.data.data.did,
+                    hexDidStr: didResponse.data.data.hexDid,
+                    controllerStr: didResponse.data.data.controller,
+                    references: user.id
+                })
+                console.log(did)
+                // TODO: Cannot make more than 2 api calls in same timeframe on free-tier
+                // Add delay as a workaround
+                const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
+                console.log("Waiting 5 seconds before creating credential...")
+                await delay(5000)
+                const credentialResponse = await axios.post(DOCKIO_BASE_URL + "credentials", {
+                    "anchor": false,
+                    "persist": true,
+                    "password": "password", //TODO: Changeme!
+                    "credential": {
+                        "name": "SJSU",
+                        "id": "http://example.com",
+                        "type": ["VerifiableCredential"],
+                        "subject": {
+                            "id": didResponse.data.did,
+                            "name": profile.displayName,
+                            "email": profile.emails[0].value
+                        },
+                        "issuer": DOCKIO_ISSUER_DID, // PseudoPass ISSUER DID
+                        "issuanceDate": "2023-03-01T00:00:00Z" // TODO: Get today's date in UTC time
+                    },
+                }, {
+                    headers: {
+                        "DOCK-API-TOKEN": DOCKIO_API_TOKEN
+                    }});
+                console.log(credentialResponse.data)
+                const vc = await Credential.create({
+                    credentialId: credentialResponse.data.id,
+                    credentialSubject: credentialResponse.data.credentialSubject,
+                    proof: credentialResponse.data.proof,
+                    issuanceDate: credentialResponse.data.issuanceDate,
+                    password: "password", //TODO: Changeme!
                     references: user.id
                 })
             }

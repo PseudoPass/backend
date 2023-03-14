@@ -17,7 +17,7 @@ const DidModel = db.define('did', {
     },
     hexDidStr: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
     },
     controllerStr: {
         type: Sequelize.STRING,
@@ -27,7 +27,7 @@ const DidModel = db.define('did', {
         type: Sequelize.INTEGER,
         allowNull: false,
         model: 'user',
-        key: 'userId'
+        key: 'id'
     }
 });
 
