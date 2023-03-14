@@ -55,6 +55,7 @@ passport.use(new GoogleStrategy({
                     controllerStr: didResponse.data.data.controller,
                     references: user.id
                 })
+                console.log(did)
                 // TODO: Cannot make more than 2 api calls in same timeframe on free-tier
                 // Add delay as a workaround
                 const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
@@ -74,22 +75,21 @@ passport.use(new GoogleStrategy({
                             "email": profile.emails[0].value
                         },
                         "issuer": DOCKIO_ISSUER_DID, // PseudoPass ISSUER DID
-                        "issuanceDate": "2023-03-01T00:00:00Z"
+                        "issuanceDate": "2023-03-01T00:00:00Z" // TODO: Get today's date in UTC time
                     },
                 }, {
                     headers: {
                         "DOCK-API-TOKEN": DOCKIO_API_TOKEN
-                    }}) .catch((e) => {
-                        console.log(e)
+                    }});
+                console.log(credentialResponse.data)
+                const vc = await Credential.create({
+                    credentialId: credentialResponse.data.id,
+                    credentialSubject: credentialResponse.data.credentialSubject,
+                    proof: credentialResponse.data.proof,
+                    issuanceDate: credentialResponse.data.issuanceDate,
+                    password: "password", //TODO: Changeme!
+                    references: user.id
                 })
-                console.log(credentialResponse)
-                // const vc = await Credential.create({
-                //     credentialId: ,
-                //     credentialSubject: ,
-                //     proof: ,
-                //     issuanceDate: ,
-                //     password:
-                // })
             }
             console.log("Logging in ...", user.dataValues);
             // TODO: Double check this logic, unsure if data being kept in user or user[0] when returning [user, created] on User.findOrCreate
