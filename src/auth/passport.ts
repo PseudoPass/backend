@@ -10,6 +10,20 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const GoogleCallbackUrl = "http://localhost:4000/auth/google/redirect";
 const {DOCKIO_API_TOKEN, DOCKIO_BASE_URL, DOCKIO_ISSUER_DID} = require('../config/env.config');
 
+function getEmailDomain(email: string) {
+    // extract domain using regex
+    var regex = /@[a-z0-9\-]+\.[a-z]{2,}$/i;
+    var domain = email.match(regex);
+
+    if (domain) {
+        // remove '@' symbol from the domain
+        return domain[0].slice(1);
+    } else {
+        // return null if no domain found
+        return null;
+    }
+}
+
 // This strategy is called when a user tries logging using the Google OAUTH button
 passport.use(new GoogleStrategy({
         clientID: process.env.GOOGLE_CLIENT_ID,
@@ -20,6 +34,9 @@ passport.use(new GoogleStrategy({
         console.log("DEBUG - Profile info: ", profile);
         console.log("Looking for user email in our database ...")
         // TODO: Optionally, check the domain for *@sjsu.edu to verify association with school
+        if (getEmailDomain(profile.emails[0].value) !== "sjsu.edu") {
+            return cb("402", null);
+        }
         try {
             const [user, created] = await User.findOrCreate({
                 where: {
