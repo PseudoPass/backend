@@ -17,7 +17,7 @@ const DidModel = db.define('did', {
     },
     hexDidStr: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
     },
     controllerStr: {
         type: Sequelize.STRING,

@@ -1,13 +1,14 @@
 import axios from "axios";
 const User = require("../models/UserModel");
 const Did = require('../models/DidModel');
+const Credential = require("../models/CredentialModel")
 const passport = require('passport');
 const passportJwt = require("passport-jwt");
 const ExtractJwt = passportJwt.ExtractJwt;
 const StrategyJwt = passportJwt.Strategy;
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const GoogleCallbackUrl = "http://localhost:4000/auth/google/redirect";
-const {DOCKIO_API_TOKEN, DOCKIO_BASE_URL} = require('../config/env.config');
+const {DOCKIO_API_TOKEN, DOCKIO_BASE_URL, DOCKIO_ISSUER_DID} = require('../config/env.config');
 
 // This strategy is called when a user tries logging using the Google OAUTH button
 passport.use(new GoogleStrategy({
@@ -39,20 +40,56 @@ passport.use(new GoogleStrategy({
                 console.log("DEBUG - USER :", user)
                 console.log("Generating DID using Dock.io ...")
                 // Make a call to Dock.io API to create a new DID for new user
-                const response = await axios.post(DOCKIO_BASE_URL + "dids", {}, {
+                const didResponse = await axios.post(DOCKIO_BASE_URL + "dids", {}, {
                     headers: {
                         "DOCK-API-TOKEN": DOCKIO_API_TOKEN
                     }
                 });
                 // Insert the DID into the database
                 console.log("Inserting new record for user:", user.id ,"'s generated DID ...")
+                console.log(didResponse.data)
                 const did = await Did.create({
-                    dockioId: response.data.id,
-                    didStr: response.data.data.did,
-                    hexDidStr: response.data.data.hexDid,
-                    controllerStr: response.data.data.controller,
+                    dockioId: didResponse.data.id,
+                    didStr: didResponse.data.data.did,
+                    hexDidStr: didResponse.data.data.hexDid,
+                    controllerStr: didResponse.data.data.controller,
                     references: user.id
                 })
+                // TODO: Cannot make more than 2 api calls in same timeframe on free-tier
+                // Add delay as a workaround
+                const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
+                console.log("Waiting 5 seconds before creating credential...")
+                await delay(5000)
+                const credentialResponse = await axios.post(DOCKIO_BASE_URL + "credentials", {
+                    "anchor": false,
+                    "persist": true,
+                    "password": "password", //TODO: Changeme!
+                    "credential": {
+                        "name": "SJSU",
+                        "id": "http://example.com",
+                        "type": ["VerifiableCredential"],
+                        "subject": {
+                            "id": didResponse.data.did,
+                            "name": profile.displayName,
+                            "email": profile.emails[0].value
+                        },
+                        "issuer": DOCKIO_ISSUER_DID, // PseudoPass ISSUER DID
+                        "issuanceDate": "2023-03-01T00:00:00Z"
+                    },
+                }, {
+                    headers: {
+                        "DOCK-API-TOKEN": DOCKIO_API_TOKEN
+                    }}) .catch((e) => {
+                        console.log(e)
+                })
+                console.log(credentialResponse)
+                // const vc = await Credential.create({
+                //     credentialId: ,
+                //     credentialSubject: ,
+                //     proof: ,
+                //     issuanceDate: ,
+                //     password:
+                // })
             }
             console.log("Logging in ...", user.dataValues);
             // TODO: Double check this logic, unsure if data being kept in user or user[0] when returning [user, created] on User.findOrCreate
