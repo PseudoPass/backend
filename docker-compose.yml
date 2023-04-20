@@ -1,0 +1,54 @@
+version: "3"
+
+services:
+  # Database
+  postgres:
+    image: postgres:15.2
+    ports:
+      - "5432:5432"
+    restart: always
+    volumes:
+      - ./postgres/database:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=pseudopass
+      - POSTGRES_PASSWORD=pseudopass-default-password123
+    networks:
+      - pseudopass-network
+  # React app & nginx server
+  frontend:
+    image: pseudopass-frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ../web/dist:/app/dist
+    networks:
+      - pseudopass-network
+  # Express.js app
+  backend:
+    restart: always
+    ports:
+      - "4000:4000"
+    image: pseudopass-backend
+    volumes:
+      - ./dist:/app
+    env_file: development.env
+    environment:
+      - ENV=development
+#      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+#      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+#      - SQL_USERNAME=${SQL_USERNAME}
+#      - SQL_DATABASE=${SQL_DATABASE}
+#      - SQL_PASSWORD=${SQL_PASSWORD}
+    depends_on:
+      - postgres
+    networks:
+      - pseudopass-network
+
+volumes:
+  schemas:
+    external: false
+
+networks:
+  pseudopass-network:
+    driver: bridge

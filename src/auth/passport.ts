@@ -7,8 +7,8 @@ const passportJwt = require("passport-jwt");
 const ExtractJwt = passportJwt.ExtractJwt;
 const StrategyJwt = passportJwt.Strategy;
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const GoogleCallbackUrl = "http://localhost:4000/auth/google/redirect";
 const {DOCKIO_API_TOKEN, DOCKIO_BASE_URL, DOCKIO_ISSUER_DID} = require('../config/env.config');
+const GoogleCallbackUrl = "http://localhost:4000/auth/google/redirect";
 
 function getEmailDomain(email: string) {
     // extract domain using regex

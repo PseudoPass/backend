@@ -25,13 +25,13 @@ app.use(session({
     cookie: { secure: false }
 }));
 
-app.use(passport.initialize());
+app.use(passport.initialize())  ;
 app.use(passport.session());
 
 // CORS
 const cors = require('cors');
-app.use(cors({ origin: CORS_ORIGIN_URL, credentials: true }));
-
+// app.use(cors({ origin: CORS_ORIGIN_URL, credentials: true }));
+app.use(cors())
 // Routes
 const credentialRoutes = require('./routes/credentialRoutes');
 const didRoutes = require('./routes/didRoutes');
@@ -40,7 +40,7 @@ const userRoutes = require('./routes/userRoutes');
 
 // Define routes
 app.use("/credentials", credentialRoutes);
-app.use("/dids", didRoutes);
+app.use("/did", didRoutes);
 app.use("/auth", authRoutes);
 app.use("/user", userRoutes);
 
