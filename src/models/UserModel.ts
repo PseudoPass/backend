@@ -35,6 +35,10 @@ const UserModel = db.define('user', {
     imageUri: {
         type: Sequelize.STRING,
         allowNull: true
+    },
+    studentId: {
+        type: Sequelize.STRING,
+        allowNull: true
     }
 });
 

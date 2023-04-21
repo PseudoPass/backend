@@ -4,14 +4,7 @@ const router = express.Router();
 const {createDids, getDid, getDidByUUID, deleteDidByUUID} = require("../controllers/didController");
 const Did = require('../models/DidModel');
 const passport = require('passport');
-
-// Custom middleware to check if the user is authenticated
-function isAuthenticated(req: any, res: any, next: any) {
-    if (req.isAuthenticated()) {
-        return next();
-    }
-    res.send(401);
-}
+import { isAuthenticated } from '../utils/isAuthenticated'
 
 router.post('/create', (req: any, res: any, next: any) => {
     console.log("create");

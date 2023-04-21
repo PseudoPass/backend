@@ -105,7 +105,7 @@ passport.use(new GoogleStrategy({
                     credentialId: credentialResponse.data.id,
                     credentialSubject: credentialResponse.data.credentialSubject,
                     proof: credentialResponse.data.proof,
-                    issuanceDate: credentialResponse.data.issuanceDate,
+                    issuanceDate: utcDate,
                     password: "password", //TODO: Changeme!
                     references: user.id
                 })

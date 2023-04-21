@@ -14,7 +14,7 @@ const cookieParser = require('cookie-parser');
 // Define middleware
 app.use(express.json());
 app.use(cookieParser());
-// Express session
+// Express session & Redis store
 const session = require('express-session');
 const redis = require('redis');
 const redisStore = require('connect-redis')(session);
@@ -34,17 +34,6 @@ require('./auth/passport');
 const passport = require('passport');
 app.use(passport.initialize())  ;
 app.use(passport.session());
-
-app.get('/auth/google',
-    passport.authenticate('google', { scope : ['profile', 'email'] }));
-
-app.get('/auth/google/callback',
-    passport.authenticate('google', { failureRedirect: '/error' }),
-    function(req, res) {
-        // Successful authentication, redirect success.
-        res.send('OK');
-    });
-
 // CORS
 const cors = require('cors');
 app.use(cors({
