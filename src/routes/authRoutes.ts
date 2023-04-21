@@ -28,11 +28,20 @@ router.get("/google/failure", (req: any, res: any) => {
 
 router.post('/logout', (req: any, res: any, next) => {
     console.log("Logging out user...")
-    req.logout(function(err: any) {
-        if (err) { return next(err); }
-        console.log("Logged out?")
-        res.clearCookie('connect.sid', {path: '/'}).status(200).send('Ok.');
+    // req.logout(function(err: any) {
+    //     if (err) { return next(err); }
+    //     console.log("Logged out?")
+    //     res.clearCookie('connect.sid', {path: '/'}).status(200).send('Ok.');
+    // });
+    req.session.destroy((err: Error) => {
+        if (err) {
+            console.log(err);
+        } else {
+            req.logout();
+            res.redirect('/');
+        }
     });
+
 });
 
 router.get("/validate", (req: any, res, next) => {

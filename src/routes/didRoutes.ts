@@ -6,7 +6,7 @@ const Did = require('../models/DidModel');
 const passport = require('passport');
 import { isAuthenticated } from '../utils/isAuthenticated'
 
-router.post('/create', (req: any, res: any, next: any) => {
+router.post('/create', isAuthenticated, (req: any, res: any, next: any) => {
     console.log("create");
     // This behavior is handled in the passport.js google login route
     createDids(req, res);
@@ -25,11 +25,14 @@ router.get('/test', isAuthenticated, (req: any, res: any, next: any) => {
         })
 });
 
-// router.get('/:uuid', (req: any, res: any, next: any) => {
-//     getDidByUUID(req, res);
-// });
+router.get('/', isAuthenticated, (req: any, res: any, next: any) => {
+    Did.findOne({where: { references: req.user.id }})
+        .then((did: Model|null) => {
+            res.send(did);
+        });
+});
 
-router.delete('/:uuid', (req: any, res: any, next: any) => {
+router.delete('/:uuid', isAuthenticated, (req: any, res: any, next: any) => {
     deleteDidByUUID(req, res);
 });
 

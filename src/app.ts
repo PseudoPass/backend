@@ -1,7 +1,7 @@
 import express from "express";
 
 // Environment
-const { CORS_ORIGIN_URL, NODE_ENV, REDIS_HOST, SQL_HOST, SQL_DATABASE, EXPRESS_SERVER_PORT} = require("./config/env.config");
+const { CORS_ORIGIN_URL, NODE_ENV, REDIS_HOST, REDIS_PORT, SQL_DATABASE, EXPRESS_SERVER_PORT} = require("./config/env.config");
 
 // Express Server
 const app = express();
@@ -20,9 +20,9 @@ const redis = require('redis');
 const redisStore = require('connect-redis')(session);
 const redisClient = redis.createClient({
     host: REDIS_HOST,
-    port: 6379
+    port: REDIS_PORT
 });
-const sessionStore = new redisStore({ client: redisClient });
+const sessionStore = new redisStore({ client: redisClient  });
 app.use(session({
     secret: 'session-secret123',
     resave: false,
@@ -37,19 +37,19 @@ app.use(passport.session());
 // CORS
 const cors = require('cors');
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: CORS_ORIGIN_URL,
     credentials: true
 }));
 // Routes
+const authRoutes = require('./routes/authRoutes');
 const credentialRoutes = require('./routes/credentialRoutes');
 const didRoutes = require('./routes/didRoutes');
-const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 
 // Define routes
+app.use("/auth", authRoutes);
 app.use("/cred", credentialRoutes);
 app.use("/did", didRoutes);
-app.use("/auth", authRoutes);
 app.use("/user", userRoutes);
 
 // Show some debug message to show environment is correct

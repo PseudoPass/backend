@@ -8,7 +8,7 @@ const errorLoginUrl = "http://localhost:3000/login/error"
 import { isAuthenticated } from '../utils/isAuthenticated';
 
 
-router.get("/profile", (req: any, res, next: NextFunction) => {
+router.get("/profile", isAuthenticated, (req: any, res, next: NextFunction) => {
     if (req.user) {
         res.send(req.user)
         console.log(req.user)

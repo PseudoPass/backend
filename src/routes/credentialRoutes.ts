@@ -8,7 +8,7 @@ const router = express.Router();
 const { postCredentials, getCredentialsByUUID, deleteCredentialsByUUID } = require("../controllers/credentialController")
 const passport = require('passport');
 const User = require("../models/UserModel")
-router.post('/', async (req: any, res: any, next: any) => {
+router.post('/', isAuthenticated, async (req: any, res: any, next: any) => {
     const user = await User.findByPk(req.user.id);
     // Check to see if user already has a credential
     const row = await Credential.findOne({where: { references: user.id}});
@@ -55,11 +55,11 @@ router.post('/', async (req: any, res: any, next: any) => {
     res.sendStatus(200);
 });
 
-router.get('/', (req: any, res: any, next: any) => {
+router.get('/', isAuthenticated,(req: any, res: any, next: any) => {
 
 });
 
-router.delete('/:uuid', (req: any, res: any, next: any) => {
+router.delete('/:uuid', isAuthenticated, (req: any, res: any, next: any) => {
     deleteCredentialsByUUID(req, res);
 });
 
