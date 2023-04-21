@@ -72,46 +72,8 @@ passport.use(new GoogleStrategy({
                     controllerStr: didResponse.data.data.controller,
                     references: user.id
                 })
-                console.log(did)
-                // TODO: Cannot make more than 2 api calls in same timeframe on free-tier
-                // Add delay as a workaround
-                const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
-                console.log("Waiting 5 seconds before creating credential...")
-                await delay(5000)
-                const currentDate = new Date();
-                const utcDate = currentDate.toISOString().slice(0, -5) + 'Z';  // TODO: Get today's date in UTC time
-                const credentialResponse = await axios.post(DOCKIO_BASE_URL + "credentials", {
-                    "anchor": false,
-                    "persist": true,
-                    "password": "password", //TODO: Changeme!
-                    "credential": {
-                        "name": "SJSU",
-                        "id": "http://example.com",
-                        "type": ["VerifiableCredential"],
-                        "subject": {
-                            "id": didResponse.data.did,
-                            "name": profile.displayName,
-                            "email": profile.emails[0].value
-                        },
-                        "issuer": DOCKIO_ISSUER_DID, // PseudoPass ISSUER DID
-                        "issuanceDate": utcDate
-                    },
-                }, {
-                    headers: {
-                        "DOCK-API-TOKEN": DOCKIO_API_TOKEN
-                    }});
-                console.log(credentialResponse.data)
-                const vc = await Credential.create({
-                    credentialId: credentialResponse.data.id,
-                    credentialSubject: credentialResponse.data.credentialSubject,
-                    proof: credentialResponse.data.proof,
-                    issuanceDate: utcDate,
-                    password: "password", //TODO: Changeme!
-                    references: user.id
-                })
             }
             console.log("Logging in ...", user.dataValues);
-            // TODO: Double check this logic, unsure if data being kept in user or user[0] when returning [user, created] on User.findOrCreate
             if (user || user[0]) {
                 return cb(null, user);
             }

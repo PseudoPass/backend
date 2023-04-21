@@ -40,14 +40,6 @@ app.use(cors({
     origin: 'http://localhost:3000',
     credentials: true
 }));
-// app.use(cors({ origin: CORS_ORIGIN_URL, credentials: true }));
-// const allowedOrigins = ['http://localhost:3000', 'http://localhost:4000'];
-// app.use(cors({
-//     origin: allowedOrigins,
-//     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-//     allowedHeaders: ['Content-Type', 'Authorization'],
-//     credentials: true,
-// }));
 // Routes
 const credentialRoutes = require('./routes/credentialRoutes');
 const didRoutes = require('./routes/didRoutes');
