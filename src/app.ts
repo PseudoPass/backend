@@ -1,7 +1,7 @@
 import express from "express";
 
 // Environment
-const { CORS_ORIGIN_URL, NODE_ENV, SQL_DATABASE, EXPRESS_SERVER_PORT } = require("./config/env.config");
+const { CORS_ORIGIN_URL, NODE_ENV, REDIS_HOST, SQL_HOST, SQL_DATABASE, EXPRESS_SERVER_PORT} = require("./config/env.config");
 
 // Express Server
 const app = express();
@@ -19,7 +19,7 @@ const session = require('express-session');
 const redis = require('redis');
 const redisStore = require('connect-redis')(session);
 const redisClient = redis.createClient({
-    host: 'localhost',
+    host: REDIS_HOST,
     port: 6379
 });
 const sessionStore = new redisStore({ client: redisClient });
