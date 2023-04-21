@@ -11,27 +11,54 @@ const jsonParser = bodyParser.json();
 app.use(jsonParser);
 app.use(bodyParser.urlencoded({ extended: true }));
 const cookieParser = require('cookie-parser');
-
+// Define middleware
+app.use(express.json());
+app.use(cookieParser());
+// Express session
+const session = require('express-session');
+const redis = require('redis');
+const redisStore = require('connect-redis')(session);
+const redisClient = redis.createClient({
+    host: 'localhost',
+    port: 6379
+});
+const sessionStore = new redisStore({ client: redisClient });
+app.use(session({
+    secret: 'session-secret123',
+    resave: false,
+    saveUninitialized: true,
+    store: sessionStore
+}));
 // Passport.js
 require('./auth/passport');
 const passport = require('passport');
-const session = require('express-session')
-
-app.use(session({
-    secret: process.env.EXPRESS_SESSION_SECRET,
-    resave: true,
-    httpOnly: true,
-    saveUninitialized: true,
-    cookie: { secure: false }
-}));
-
 app.use(passport.initialize())  ;
 app.use(passport.session());
 
+app.get('/auth/google',
+    passport.authenticate('google', { scope : ['profile', 'email'] }));
+
+app.get('/auth/google/callback',
+    passport.authenticate('google', { failureRedirect: '/error' }),
+    function(req, res) {
+        // Successful authentication, redirect success.
+        res.send('OK');
+    });
+
 // CORS
 const cors = require('cors');
+app.use(cors({
+    origin: 'http://localhost:3000',
+    credentials: true
+}));
 // app.use(cors({ origin: CORS_ORIGIN_URL, credentials: true }));
-app.use(cors())
+// const allowedOrigins = ['http://localhost:3000', 'http://localhost:4000'];
+// app.use(cors({
+//     origin: allowedOrigins,
+//     methods: ['GET', 'POST', 'PUT', 'DELETE'],
+//     allowedHeaders: ['Content-Type', 'Authorization'],
+//     credentials: true,
+// }));
 // Routes
 const credentialRoutes = require('./routes/credentialRoutes');
 const didRoutes = require('./routes/didRoutes');
@@ -39,14 +66,10 @@ const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 
 // Define routes
-app.use("/credentials", credentialRoutes);
+app.use("/cred", credentialRoutes);
 app.use("/did", didRoutes);
 app.use("/auth", authRoutes);
 app.use("/user", userRoutes);
-
-// Define middleware
-app.use(express.json());
-app.use(cookieParser());
 
 // Show some debug message to show environment is correct
 console.log("Environment:", NODE_ENV, "\nDatabase:", SQL_DATABASE);
