@@ -40,7 +40,6 @@ router.get("/validate", (req: any, res, next) => {
     if (req.user) {
         res.send(req.user);
         console.log("Validated user:", req.user);
-        // next();
     } else {
         res.status(401).send("You must login first!");
     }

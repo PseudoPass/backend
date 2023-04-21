@@ -78,6 +78,8 @@ passport.use(new GoogleStrategy({
                 const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
                 console.log("Waiting 5 seconds before creating credential...")
                 await delay(5000)
+                const currentDate = new Date();
+                const utcDate = currentDate.toISOString().slice(0, -5) + 'Z';  // TODO: Get today's date in UTC time
                 const credentialResponse = await axios.post(DOCKIO_BASE_URL + "credentials", {
                     "anchor": false,
                     "persist": true,
@@ -92,7 +94,7 @@ passport.use(new GoogleStrategy({
                             "email": profile.emails[0].value
                         },
                         "issuer": DOCKIO_ISSUER_DID, // PseudoPass ISSUER DID
-                        "issuanceDate": "2023-03-01T00:00:00Z" // TODO: Get today's date in UTC time
+                        "issuanceDate": utcDate
                     },
                 }, {
                     headers: {
@@ -103,7 +105,7 @@ passport.use(new GoogleStrategy({
                     credentialId: credentialResponse.data.id,
                     credentialSubject: credentialResponse.data.credentialSubject,
                     proof: credentialResponse.data.proof,
-                    issuanceDate: credentialResponse.data.issuanceDate,
+                    issuanceDate: utcDate,
                     password: "password", //TODO: Changeme!
                     references: user.id
                 })
@@ -124,19 +126,23 @@ passport.use(new GoogleStrategy({
 
 ))
 
-passport.serializeUser((user: any, cb: any) => {
+passport.serializeUser((user: any, done: any) => {
     console.log("Serializing:", user);
-    cb(null, user.id);
+    done(null, user.id);
+});
+passport.deserializeUser((id: any, done: any) => {
+
+    User.findOne({ where: { id: id } })
+        .then((user: any) => {
+            console.log("Deserialized user", user)
+            done(null, user);
+        })
+        .catch((err: any) => {
+            console.log("Error deserializing", err);
+            done(err, null);
+        });
 });
 
-passport.deserializeUser(async (id: any, cb: any) => {
-    const user = await User.findOne({ where: {id} }).catch((err: any) => {
-        console.log("Error deserializing", err);
-        cb(err, null);
-    })
-    console.log("Deserialized user", user)
-    if (user) cb(null, user);
-});
 
 passport.use(
     new StrategyJwt(
@@ -155,3 +161,4 @@ passport.use(
         }
     )
 );
+
