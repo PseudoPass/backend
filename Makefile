@@ -1,5 +1,5 @@
 frontend-build:
-	docker build -t pseudopass-frontend -f ../web/Dockerfile .
+	docker build -t pseudopass-frontend ../web
 
 backend-build:
 	docker build -t pseudopass-backend .
