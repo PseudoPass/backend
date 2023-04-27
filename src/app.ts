@@ -4,7 +4,7 @@ import express from "express";
 const { CORS_ORIGIN_URL, NODE_ENV, REDIS_HOST, REDIS_PORT, SQL_DATABASE, EXPRESS_SERVER_PORT} = require("./config/env.config");
 
 // Express Server
-const app = express();
+const app: any = express();
 const http = require('http');
 const bodyParser = require("body-parser");
 const jsonParser = bodyParser.json();
