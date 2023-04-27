@@ -15,6 +15,7 @@ services:
       - POSTGRES_PASSWORD=pseudopass-default-password123
     networks:
       - pseudopass-network
+
   # Redis cache
   redis:
     image: "redis:6.0.12"
@@ -22,7 +23,8 @@ services:
       - "6379:6379"
     networks:
       - pseudopass-network
-  # React app & nginx server
+
+  # React app
   frontend:
     image: pseudopass-frontend
     ports:
@@ -30,29 +32,58 @@ services:
       - "443:443"
     volumes:
       - ../web/dist:/app/dist
+      - ./certs:/etc/letsencrypt/live/pseudopass.org/
     networks:
       - pseudopass-network
+
+#      - ./certs:/etc/letsencrypt/live/pseudopass.org/
+#      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+#      - ./data:/data/letsencrypt
+#      - ../web/build:/usr/share/nginx/html
   # Express.js app
   backend:
     restart: always
     ports:
-      - "4000:4000"
+      - "4443:4443"
     image: pseudopass-backend
     volumes:
       - ./dist:/app
     env_file: production.env
     environment:
       - ENV=production
-#      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
-#      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
-#      - SQL_USERNAME=${SQL_USERNAME}
-#      - SQL_DATABASE=${SQL_DATABASE}
-#      - SQL_PASSWORD=${SQL_PASSWORD}
     depends_on:
       - postgres
       - redis
     networks:
       - pseudopass-network
+  # Certbot Let's Encrypt SSL Certificate
+#  certbot:
+#    image: certbot/certbot
+#    command: certonly --webroot --webroot-path=/data/letsencrypt --email "michael.ruiz@sjsu.edu" --agree-tos --no-eff-email -d pseudopass.org -d api.pseudopass.org
+#    volumes:
+#      - ./data:/data/letsencrypt
+#      - ./certs:/etc/letsencrypt
+#    networks:
+#      - pseudopass-network
+#    depends_on:
+#      - nginx
+
+  # Nginx web server & reverse proxy
+#  nginx:
+#    image: nginx:alpine
+#    ports:
+#      - "80:80"
+#      - "443:443"
+#    volumes:
+#      - ./certs:/etc/letsencrypt/live/pseudopass.org/
+#      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+#      - ./data:/data/letsencrypt
+#      - ../web/build:/usr/share/nginx/html
+#    depends_on:
+#      - backend
+#      - frontend
+#    networks:
+#      - pseudopass-network
 
 volumes:
   schemas:

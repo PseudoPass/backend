@@ -1,11 +1,10 @@
 import express, { NextFunction, Request, Response } from "express";
 
 import handleResponse from "../utils/handleResponse";
+import {isAuthenticated} from "../utils/isAuthenticated";
 const router = express.Router();
 const passport = require('passport');
-
-const successLoginUrl = "http://localhost:3000/login/success"
-const errorLoginUrl = "http://localhost:3000/login/error"
+const { CORS_ORIGIN_URL } = require("../config/env.config");
 
 router.get("/google", passport.authenticate("google", { scope: ["profile", "email"], prompt: 'consent'},
     (req: any, res: any) => {
@@ -14,8 +13,8 @@ router.get("/google", passport.authenticate("google", { scope: ["profile", "emai
 
 router.get('/google/redirect',
     passport.authenticate('google', {
-        successRedirect: successLoginUrl,
-        failureRedirect: errorLoginUrl,
+        successRedirect:  `${CORS_ORIGIN_URL}/login/success`,
+        failureRedirect: `${CORS_ORIGIN_URL}/login/error`,
         failureMessage: "Cannot login to Google, please try again later"
     }),
     function(req: any, res: any) {
@@ -45,12 +44,13 @@ router.post('/logout', (req: any, res: any, next: NextFunction) => {
 
 });
 
-router.get("/validate", (req: any, res: any, next: NextFunction) => {
+router.get("/validate", isAuthenticated, (req: any, res: any, next: NextFunction) => {
     console.log("Validating user authentication...");
     if (req.user) {
         res.send(req.user);
         console.log("Validated user:", req.user);
     } else {
+        console.log(req.user)
         res.status(401).send("You must login first!");
     }
 })

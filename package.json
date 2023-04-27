@@ -1,7 +1,7 @@
 {
   "name": "backend",
-  "version": "0.0.1",
-  "description": "",
+  "version": "1.0",
+  "description": "PseudoPass Backend Express REST API Server",
   "main": "src/app.ts",
   "scripts": {
     "start": "npx tsc && NODE_ENV=production node ./dist/app.js",
