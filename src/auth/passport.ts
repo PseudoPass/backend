@@ -1,14 +1,12 @@
 import axios from "axios";
 const User = require("../models/UserModel");
 const Did = require('../models/DidModel');
-const Credential = require("../models/CredentialModel")
 const passport = require('passport');
 const passportJwt = require("passport-jwt");
 const ExtractJwt = passportJwt.ExtractJwt;
 const StrategyJwt = passportJwt.Strategy;
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const {DOCKIO_API_TOKEN, DOCKIO_BASE_URL, DOCKIO_ISSUER_DID} = require('../config/env.config');
-const GoogleCallbackUrl = "http://localhost:4000/auth/google/redirect";
+const { EXPRESS_SERVER_URL, DOCKIO_API_TOKEN, DOCKIO_BASE_URL } = require('../config/env.config');
 
 function getEmailDomain(email: string) {
     // extract domain using regex
@@ -28,7 +26,7 @@ function getEmailDomain(email: string) {
 passport.use(new GoogleStrategy({
         clientID: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        callbackURL: GoogleCallbackUrl,
+        callbackURL: `${EXPRESS_SERVER_URL}/auth/google/redirect`,
         passReqToCallback: true
     }, async (req: any, accessToken: any, refreshToken: any, profile: any, cb: any) => {
         console.log("DEBUG - Profile info: ", profile);
@@ -72,8 +70,9 @@ passport.use(new GoogleStrategy({
                     controllerStr: didResponse.data.data.controller,
                     references: user.id
                 })
+                console.log("Created new DID record", did)
             }
-            console.log("Logging in ...", user.dataValues);
+            console.log("Logging in ...", user);
             if (user || user[0]) {
                 return cb(null, user);
             }

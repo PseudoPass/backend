@@ -1,23 +1,23 @@
-import express from "express";
+import express, { NextFunction, Request, Response } from "express";
+
 import handleResponse from "../utils/handleResponse";
+import {isAuthenticated} from "../utils/isAuthenticated";
 const router = express.Router();
 const passport = require('passport');
-
-const successLoginUrl = "http://localhost:3000/login/success"
-const errorLoginUrl = "http://localhost:3000/login/error"
+const { CORS_ORIGIN_URL } = require("../config/env.config");
 
 router.get("/google", passport.authenticate("google", { scope: ["profile", "email"], prompt: 'consent'},
-    (req:any, res:any) => {
+    (req: any, res: any) => {
         console.log("hi")
 }));
 
 router.get('/google/redirect',
     passport.authenticate('google', {
-        successRedirect: successLoginUrl,
-        failureRedirect: errorLoginUrl,
+        successRedirect:  `${CORS_ORIGIN_URL}/login/success`,
+        failureRedirect: `${CORS_ORIGIN_URL}/login/error`,
         failureMessage: "Cannot login to Google, please try again later"
     }),
-    function(req, res) {
+    function(req: any, res: any) {
         // Successful authentication, redirect home.
         res.send('Successfully logged in');
     });
@@ -26,7 +26,7 @@ router.get("/google/failure", (req: any, res: any) => {
     handleResponse(req, res, 403, "AUTH FAILURE")
 });
 
-router.post('/logout', (req: any, res: any, next) => {
+router.post('/logout', (req: any, res: any, next: NextFunction) => {
     console.log("Logging out user...")
     // req.logout(function(err: any) {
     //     if (err) { return next(err); }
@@ -44,12 +44,13 @@ router.post('/logout', (req: any, res: any, next) => {
 
 });
 
-router.get("/validate", (req: any, res, next) => {
+router.get("/validate", isAuthenticated, (req: any, res: any, next: NextFunction) => {
     console.log("Validating user authentication...");
     if (req.user) {
         res.send(req.user);
         console.log("Validated user:", req.user);
     } else {
+        console.log(req.user)
         res.status(401).send("You must login first!");
     }
 })

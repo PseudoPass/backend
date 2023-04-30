@@ -18,6 +18,7 @@ module.exports = {
     EXPRESS_SERVER_HOST: process.env.EXPRESS_SERVER_HOST || 'localhost',
     EXPRESS_SERVER_PORT: process.env.EXPRESS_SERVER_PORT || 4000,
     CORS_ORIGIN_URL: process.env.CORS_ORIGIN_URL || 'http://localhost:3000',
+    EXPRESS_SERVER_URL: process.env.EXPRESS_SERVER_URL || 'http://localhost:4000',
     SQL_HOST: process.env.SQL_HOST || 'localhost',
     SQL_PORT: process.env.SQL_PORT || 5432,
     SQL_USER: process.env.SQL_USERNAME || "postgres",

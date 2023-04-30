@@ -5,7 +5,7 @@ backend-build:
 	docker build -t pseudopass-backend .
 
 compose-up: frontend-build backend-build
-	docker-compose -p pseudopass up
+	docker-compose -p pseudopass up -d
 
 database-up:
 	docker-compose -p pseudopass up redis postgres -d

@@ -1,11 +1,13 @@
 import express from "express";
+import * as fs from "fs";
 
 // Environment
-const { CORS_ORIGIN_URL, NODE_ENV, REDIS_HOST, REDIS_PORT, SQL_DATABASE, EXPRESS_SERVER_PORT} = require("./config/env.config");
+const { CORS_ORIGIN_URL, NODE_ENV, REDIS_HOST, REDIS_PORT, SQL_DATABASE, EXPRESS_SERVER_PORT, EXPRESS_SESSION_SECRET} = require("./config/env.config");
 
 // Express Server
-const app = express();
+const app: any = express();
 const http = require('http');
+const https = require('https');
 const bodyParser = require("body-parser");
 const jsonParser = bodyParser.json();
 app.use(jsonParser);
@@ -14,6 +16,12 @@ const cookieParser = require('cookie-parser');
 // Define middleware
 app.use(express.json());
 app.use(cookieParser());
+// CORS
+const cors = require('cors');
+app.use(cors({
+    origin: CORS_ORIGIN_URL,
+    credentials: true
+}));
 // Express session & Redis store
 const session = require('express-session');
 const redis = require('redis');
@@ -22,24 +30,22 @@ const redisClient = redis.createClient({
     host: REDIS_HOST,
     port: REDIS_PORT
 });
+app.set('trust proxy', 1);
 const sessionStore = new redisStore({ client: redisClient  });
 app.use(session({
-    secret: 'session-secret123',
-    resave: false,
+    secret: EXPRESS_SESSION_SECRET,
+    sameSite: 'Lax',
+    resave: true,
     saveUninitialized: true,
-    store: sessionStore
+    store: sessionStore,
+    cookie: { secure: NODE_ENV === 'production' },
+    proxy: true,
 }));
 // Passport.js
 require('./auth/passport');
 const passport = require('passport');
-app.use(passport.initialize())  ;
+app.use(passport.initialize());
 app.use(passport.session());
-// CORS
-const cors = require('cors');
-app.use(cors({
-    origin: CORS_ORIGIN_URL,
-    credentials: true
-}));
 // Routes
 const authRoutes = require('./routes/authRoutes');
 const credentialRoutes = require('./routes/credentialRoutes');
@@ -54,11 +60,33 @@ app.use("/user", userRoutes);
 
 // Show some debug message to show environment is correct
 console.log("Environment:", NODE_ENV, "\nDatabase:", SQL_DATABASE);
-// Start listening on selected port
-http.createServer(app).listen(EXPRESS_SERVER_PORT, (error?: any) => {
-    if(!error)
-        console.log("Server is Successfully Running, and App is listening on port " + EXPRESS_SERVER_PORT)
-    else
-        console.log("Error occurred, server can't start", error);
-    }
-);
+
+if (NODE_ENV == "production") {
+    const httpsOptions = {
+        key: fs.readFileSync('key.pem'),
+        cert: fs.readFileSync('cert.pem')
+    };
+    // Start HTTPS server listening on selected port
+    const server = https.createServer(httpsOptions, app)
+    server.listen(EXPRESS_SERVER_PORT, (error?: any) => {
+            if(!error)
+            {
+                console.log("Server is Successfully Running, and App is listening on port " + EXPRESS_SERVER_PORT)
+            }
+            else
+                console.log("Error occurred, server can't start", error);
+        }
+    );
+} else {
+    // Start HTTP server listening on selected port
+    const server = http.createServer(app)
+    server.listen(EXPRESS_SERVER_PORT, (error?: any) => {
+            if(!error)
+            {
+                console.log("Server is Successfully Running, and App is listening on port " + EXPRESS_SERVER_PORT)
+            }
+            else
+                console.log("Error occurred, server can't start", error);
+        }
+    );
+}
