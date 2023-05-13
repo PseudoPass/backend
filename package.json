@@ -10,7 +10,8 @@
     "syncdb": "npx tsc && NODE_ENV=development node ./tools/resetDB.js",
     "force-syncdb": "npx tsc && NODE_ENV=development FORCE=1 node ./tools/resetDB.js",
     "copy-env": "mv ./development.env ./development.env.bak && cp ./examples/sample.env ./development.env",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "push-production": "rsync -av --exclude='.git' --exclude='node_modules/' --exclude='.idea' --exclude='certs/' --exclude='postgres/' --delete ../../PseudoPass root@pseudopass.org:/srv/"
   },
   "repository": {
     "type": "git",

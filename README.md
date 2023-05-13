@@ -18,8 +18,11 @@ createdb pseudopass
 exit
 exit
 ```
+Note: Running `make database-up` may also work in place of this to setup Redis and Postgres server.
+### Preparing Redis server
+Running `make database-up` should start both postgres and redis, otherwise spin up a redis container manually.
 ### Preparing Development Server Environment
-1. Ensure you have set up a postgres instance on your local machine (recommended using Docker)
+1. Ensure you have set up a postgres & redis instance running on your local machine (recommended using Docker)
 2. Copy the `sample.env` as `development.env` using the helper script: `npm run copy-env`. 
 This script will attempt to backup your .env file if it already exists as `development.env.bak` so that you can 
 move any values over from the backup file to the new copy if the sample file has any major changes during development.
@@ -33,3 +36,9 @@ move any values over from the backup file to the new copy if the sample file has
    update the relational database schema.
 6. Run the development server in watch mode`npm run start-dev`
 
+## Running Production Server
+### via Docker Compose
+Simply run `make compose-up` to create a production build of the frontend and backend app.
+This requires a valid SSL certificate to run on port 443 however, so extra steps are required.
+
+- Ensure your `production.env` file have correct variables
