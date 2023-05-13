@@ -36,6 +36,8 @@ move any values over from the backup file to the new copy if the sample file has
    update the relational database schema.
 6. Run the development server in watch mode`npm run start-dev`
 
+Note: The backend will not function without the proper environment variables such as Dock.io API key and Google API key.
+Contact Michael Ruiz for assistance for populating the file with the proper environment variables.
 ## Running Production Server
 ### via Docker Compose
 Simply run `make compose-up` to create a production build of the frontend and backend app.
